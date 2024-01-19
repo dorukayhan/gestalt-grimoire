@@ -16,7 +16,6 @@
   "private": true,
   "dependencies": {
     "@twurple/api": "7.0.7",
-    "@twurple/chat": "7.0.7",
-    "@twurple/easy-bot": "7.0.7"
+    "@twurple/chat": "7.0.7"
   }
 }

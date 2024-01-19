@@ -1,9 +1,11 @@
 import { RefreshingAuthProvider } from '@twurple/auth';
-import { Bot, createBotCommand } from '@twurple/easy-bot';
+import { ChatClient } from '@twurple/chat';
 import { promises as fs } from 'fs';
 
 /**
  * various settings and options and knobs
+ * contains builtinCommand ("prefix" for builtins like editing commands and
+ * restarting/shutting down, string)
  */
 const settings = JSON.parse(await fs.readFile("conf/settings.json", "utf-8"));
 /**
@@ -32,18 +34,23 @@ auth.onRefresh(async (userId, newToken) => {
 await auth.addUserForToken(tokens, ["chat"]);
 
 /** the */
-const bot = new Bot({
+const chat = new ChatClient({
     authProvider: auth,
     channels: [secrets.streamerUsername],
-    commands: [
-        createBotCommand("spinrightround", (params, ctx) => {
-            console.log(`getting rotated by ${ctx.userName}`);
-            ctx.say("owoSpin YaeSpin AINTNOWAY");
-        })
-    ]
+    isAlwaysMod: true,
+    requestMembershipEvents: false // only trigger onJoin on bot joining
+});
+chat.onJoin((channel, user) => {
+    console.log(`joined ${channel}`);
+    const page = Math.ceil(Math.random() * 1000);
+    chat.action(channel, `glows magenta and opens to page ${page}`);
+});
+chat.onMessage((channel, user, text, msg) => {
+    console.log(`message by ${user}: ${text}`);
+    if (user.toLowerCase() != secrets.botUsername.toLowerCase() && text.startsWith("!spinrightround")) {
+        console.log(`getting rotated by ${user}`);
+        chat.say(channel, "owoSpin YaeSpin AINTNOWAY");
+    }
 });
 
-bot.onJoin((joinEvent) => {
-    console.log(`joined ${joinEvent.broadcasterName}'s chat`);
-    bot.say(joinEvent.broadcasterName, "Hellowo");
-});
+chat.connect();
