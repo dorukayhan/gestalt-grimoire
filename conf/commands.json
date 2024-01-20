@@ -1,0 +1,17 @@
+{
+    "prefix": {
+        "!spin": {
+            "type": "text",
+            "body": "owoSpin",
+            "userlevel": "everyone",
+            "cooldown": 30,
+            "enabled": true
+        }
+    },
+    "infix": {
+
+    },
+    "regex": {
+
+    }
+}

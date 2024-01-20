@@ -1,6 +1,6 @@
 # Gestalt Grimoire
 
-Here's yet another chat command engine for Twitch. It exists solely because I couldn't be bothered to learn [advanced Nightbot sorcery](https://docs.nightbot.tv/commands/variableslist)'.
+Here's yet another chat command engine for Twitch. It exists solely because I couldn't be bothered to learn [advanced Nightbot sorcery](https://docs.nightbot.tv/commands/variableslist).
 
 <sup>It also makes for nice "I know JS of the Node variety!" cred.</sup>
 
