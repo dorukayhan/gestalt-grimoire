@@ -5,7 +5,7 @@ import { Util } from './util.mjs';
 
 /**
  * various settings and options and knobs
- * contains builtinCommand ("prefix" for builtins like editing commands and
+ * contains builtin ("prefix" for builtins like editing commands and
  * restarting/shutting down, string)
  */
 const settings = JSON.parse(await fs.readFile("conf/settings.json", "utf-8"));
@@ -74,7 +74,7 @@ function builtin(channel, user, text, msg) {
     return false; // TODO
 }
 function prefix(channel, user, text, msg) {
-    const firstword = text.split(' ', 1)[0];
+    const firstword = text.split(' ', 1)[0]; // NO SPACES IN PREFIXES!
     let command = commands.prefix[firstword] // undefined for cmds that don't exist
     if (command && command.enabled && Util.commandNotOnCD(command)) {
         // TODO add userlevel check
