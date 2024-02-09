@@ -3,6 +3,7 @@
 
 conf/tokens.json
 conf/secrets.json
+conf/cmdstate
 
 # Logs
 logs

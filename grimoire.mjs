@@ -5,15 +5,15 @@ import { Util } from './util.mjs';
 
 /**
  * various settings and options and knobs
- * contains builtin ("prefix" for builtins like editing commands and
- * restarting/shutting down, string)
+ * see the file itself; it should have a default value for every
+ * available setting
  */
 const settings = JSON.parse(await fs.readFile("conf/settings.json", "utf-8"));
 /**
  * settings that are a bad idea to put in a public repo
  * contains streamerUsername (your username, string), botUsername (string),
  * clientId (string), clientSecret (string), streamSafeTerminal
- * (whether the terminal is safe to show on stream, boolean, see auth.onRefresh)
+ * (whether the terminal is safe to show on stream, boolean, see auth.onRefresh below)
  */
 const secrets = JSON.parse(await fs.readFile("conf/secrets.json", "utf-8"));
 /**
@@ -47,7 +47,7 @@ const chat = new ChatClient({
 });
 chat.onJoin((channel, user) => {
     console.log(`joined ${channel}`);
-    const page = Math.ceil(Math.random() * 1000);
+    const page = Math.ceil(Math.random() * 727);
     chat.action(channel, `glows magenta and opens to page ${page}`);
 });
 chat.onMessage((channel, user, text, msg) => {
@@ -60,6 +60,10 @@ chat.onMessage((channel, user, text, msg) => {
         else if (regex(channel, user, text, msg));
     }
 });
+const shat = { // code commands need say() and action() and absolutely no other ChatClient method
+    say: chat.say,
+    action: chat.action
+};
 
 chat.connect();
 
@@ -92,7 +96,7 @@ function regex(channel, user, text, msg) {
     return false; // TODO
 }
 function executeCommand(command, channel, user, text, msg) {
-    switch(command.type) {
+    switch(command.action) {
         case "text":
             chat.say(channel, command.body);
             break;

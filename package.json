@@ -2,7 +2,7 @@
   "name": "gestalt-grimoire",
   "version": "7.2.7",
   "description": "Yet another command-based chatbot",
-  "main": "grimoire.js",
+  "main": "grimoire.mjs",
   "homepage": "https://github.com/dorukayhan/gestalt-grimoire",
   "bugs": "https://github.com/dorukayhan/gestalt-grimoire/issues",
   "scripts": {
@@ -13,6 +13,7 @@
     "url": "https://dorukayhan.github.io"
   },
   "license": "MIT",
+  "repository": "github:dorukayhan/gestalt-grimoire",
   "private": true,
   "dependencies": {
     "@twurple/chat": "7.0.7"
