@@ -6,6 +6,13 @@
             "userlevel": "everyone",
             "cooldown": 30,
             "enabled": true
+        },
+        "!hugme": {
+            "action": "code",
+            "body": "hugme",
+            "userlevel": "everyone",
+            "cooldown": 10,
+            "enabled": true
         }
     },
     "infix": {

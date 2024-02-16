@@ -2,6 +2,7 @@ import { RefreshingAuthProvider } from '@twurple/auth';
 import { ChatClient } from '@twurple/chat';
 import { promises as fs } from 'fs';
 import { Util } from './util.mjs';
+import { codecmds } from './conf/commands.mjs';
 
 /**
  * various settings and options and knobs
@@ -100,7 +101,10 @@ function executeCommand(command, channel, user, text, msg) {
         case "text":
             chat.say(channel, command.body);
             break;
+        case "code":
+            codecmds[command.body](shat, channel, user, text, msg);
+            break;
         default:
-            chat.say(channel, "Non-text commands not implemented yet");
+            chat.say(channel, "Aliases not implemented yet");
     }
 }
