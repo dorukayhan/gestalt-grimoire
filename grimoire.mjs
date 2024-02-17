@@ -2,7 +2,6 @@ import { RefreshingAuthProvider } from '@twurple/auth';
 import { ChatClient } from '@twurple/chat';
 import { promises as fs } from 'fs';
 import { Util } from './util.mjs';
-import { codecmds } from './conf/commands.mjs';
 
 /**
  * various settings and options and knobs
@@ -67,21 +66,20 @@ const shat = { // code commands need say() and action() and absolutely no other 
 };
 
 chat.connect();
+// import code commands last to avoid blocking chat.connect() or something idk
+let { codecmds } = await import("./conf/commands.mjs");
 
 /* 
 the actual command engines
-this would get ugly without type annotations. I do NOT want to
-deal with transpiling typescript and bun is getting a windows
-release soon (https://twitter.com/bunjavascript/status/1747073096295874990),
-so I should just wait until then to develop the bot further
+TODO switch to bun and typescript to make the function signatures not ugly
 */
 function builtin(channel, user, text, msg) {
     return false; // TODO
 }
 function prefix(channel, user, text, msg) {
-    const firstword = text.split(' ', 1)[0]; // NO SPACES IN PREFIXES!
+    const [firstword] = text.split(' ', 1); // NO SPACES IN PREFIXES!
     let command = commands.prefix[firstword] // undefined for cmds that don't exist
-    if (command && command.enabled && Util.commandNotOnCD(command)) {
+    if (command && command.enabled && Util.isOffCD(command)) {
         // TODO add userlevel check
         command.lastUsed = Date.now();
         console.log(`${user} used prefix ${firstword} @ ${new Date(command.lastUsed).toISOString()}`);
@@ -102,9 +100,31 @@ function executeCommand(command, channel, user, text, msg) {
             chat.say(channel, command.body);
             break;
         case "code":
-            codecmds[command.body](shat, channel, user, text, msg);
+            try {
+                codecmds[command.body](shat, channel, user, text, msg);
+            } catch (e) {
+                console.error(e);
+                chat.say(channel, `@${secrets.streamerUsername} Check the terminal (codecmds.${command.body} frew up)`);
+            }
+            break;
+        case "alias":
+            const { type, trigger } = Util.parseAlias(command.body);
+            if (!Util.isValidType(type) || !commands[type][trigger]) {
+                console.error(`nonexistent alias target ${command.body}`);
+                chat.say(channel, `@${secrets.streamerUsername} Check the terminal (${command.body} has to exist for its aliases to work)`);
+                break;
+            }
+            if (commands[type][trigger].action === "alias") { // no recursive aliases
+                console.error(`invalid alias target ${command.body} (it's already an alias)`);
+                chat.say(channel, `@${secrets.streamerUsername} Check the terminal (${command.body} is an alias itself and can't have aliases)`);
+                break;
+            }
+            // not setting lastUsed for the alias target is intentional
+            console.log(`running aliased ${command.body}`)
+            executeCommand(commands[type][trigger], channel, user, text, msg);
             break;
         default:
-            chat.say(channel, "Aliases not implemented yet");
+            console.error(`invalid action ${command.action}`);
+            chat.say(channel, `@${secrets.streamerUsername} Check the terminal (${command.action} isn't a valid command action)`);
     }
 }
