@@ -60,10 +60,6 @@ chat.onMessage((channel, user, text, msg) => {
         else if (regex(channel, user, text, msg));
     }
 });
-const shat = { // code commands need say() and action() and absolutely no other ChatClient method
-    say: chat.say,
-    action: chat.action
-};
 
 chat.connect();
 // import code commands last to avoid blocking chat.connect() or something idk
@@ -101,7 +97,7 @@ function executeCommand(command, channel, user, text, msg) {
             break;
         case "code":
             try {
-                codecmds[command.body](shat, channel, user, text, msg);
+                codecmds[command.body](chat, channel, user, text, msg);
             } catch (e) {
                 console.error(e);
                 chat.say(channel, `@${secrets.streamerUsername} Check the terminal (codecmds.${command.body} frew up)`);

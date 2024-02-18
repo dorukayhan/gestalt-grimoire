@@ -77,7 +77,7 @@ The built-in is always enabled, can only be used by mods and the streamer, and h
 You can put code in conf/commands.mjs to be executed via commands.  
 If this makes your inner infosec whiz scream in horror, good. If not, **remember to not put anything in them that you don't FULLY understand!**
 
-(hint: if it touches conf/tokens.json _at all_, it's probably a login stealer; only grimoire.mjs should be messing with your tokens)
+(hint: if it touches conf/tokens.json _at all_ or calls any `chat` method other than `say()` and `action()`, it's malware; only grimoire.mjs should be doing those)
 
 #### Code commands
 
