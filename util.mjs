@@ -28,6 +28,26 @@ class Util {
     static isValidType(type) {
         return /^(prefix|infix|regex)$/.test(type);
     }
+    /**
+     * `true` if `user` is allowed to use `command`
+     * @param user a ChatUser like `msg.userInfo`
+     */
+    static meetsUserlevel(command, user) {
+        switch (command.userlevel) {
+            case "everyone": return true;
+            case "mod": return user.isMod || user.isBroadcaster;
+            case "streamer": return user.isBroadcaster;
+            default:
+                console.error(`invalid userlevel ${command.userlevel}! assuming everyone!`);
+                return true;
+        }
+    }
+    /**
+     * `command.enabled && Util.isOffCD(command) && Util.meetsUserlevel(command, msg.userInfo)`
+     */
+    static goForLaunch(command, msg) {
+        return command.enabled && Util.isOffCD(command) && Util.meetsUserlevel(command, msg.userInfo);
+    }
 }
 
 export { Util };

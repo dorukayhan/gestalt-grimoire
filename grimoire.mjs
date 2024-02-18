@@ -75,8 +75,7 @@ function builtin(channel, user, text, msg) {
 function prefix(channel, user, text, msg) {
     const [firstword] = text.split(' ', 1); // NO SPACES IN PREFIXES!
     let command = commands.prefix[firstword] // undefined for cmds that don't exist
-    if (command && command.enabled && Util.isOffCD(command)) {
-        // TODO add userlevel check
+    if (command && Util.goForLaunch(command, msg)) {
         command.lastUsed = Date.now();
         console.log(`${user} used prefix ${firstword} @ ${new Date(command.lastUsed).toISOString()}`);
         executeCommand(command, channel, user, text, msg);
@@ -85,9 +84,30 @@ function prefix(channel, user, text, msg) {
     return false;
 }
 function infix(channel, user, text, msg) {
-    return false; // TODO
+    // can't optimize infix and regex like we can w/ prefix
+    // no problem, computers are fast
+    for (const trigger in commands.infix) {
+        let command = commands.infix[trigger];
+        if (text.includes(trigger) && Util.goForLaunch(command, msg)) {
+            command.lastUsed = Date.now();
+            console.log(`${user} used infix ${trigger} @ ${new Date(command.lastUsed).toISOString()}`);
+            executeCommand(command, channel, user, text, msg);
+            return true;
+        }
+    }
+    return false;
 }
 function regex(channel, user, text, msg) {
+    for (const trigger in commands.regex) {
+        let command = commands.regex[trigger];
+        let re = new RegExp(trigger, command.flags ?? "su");
+        if (re.test(text) && Util.goForLaunch(command, msg)) {
+            command.lastUsed = Date.now();
+            console.log(`${user} used regex ${trigger} @ ${new Date(command.lastUsed).toISOString()}`);
+            executeCommand(command, channel, user, text, msg);
+            return true;
+        }
+    }
     return false; // TODO
 }
 function executeCommand(command, channel, user, text, msg) {
