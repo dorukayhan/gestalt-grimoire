@@ -4,14 +4,21 @@
             "action": "text",
             "body": "owoSpin",
             "userlevel": "everyone",
-            "cooldown": 30,
+            "cooldown": 5,
             "enabled": true
         },
         "!hugme": {
             "action": "code",
             "body": "hugme",
             "userlevel": "everyone",
-            "cooldown": 10,
+            "cooldown": 5,
+            "enabled": true
+        },
+        "!math": {
+            "action": "code",
+            "body": "math",
+            "userlevel": "everyone",
+            "cooldown": 5,
             "enabled": true
         }
     },
