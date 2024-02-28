@@ -12,8 +12,8 @@ const settings = JSON.parse(await fs.readFile("conf/settings.json", "utf-8"));
 /**
  * settings that are a bad idea to put in a public repo
  * contains streamerUsername (your username, string), botUsername (string),
- * clientId (string), clientSecret (string), streamSafeTerminal
- * (whether the terminal is safe to show on stream, boolean, see auth.onRefresh below)
+ * clientId (string), clientSecret (string), extremelyStreamUnsafeTerminal
+ * (whether auth tokens are printed, boolean) 
  */
 const secrets = JSON.parse(await fs.readFile("conf/secrets.json", "utf-8"));
 /**
@@ -33,7 +33,7 @@ const auth = new RefreshingAuthProvider({
 // set up auth
 auth.onRefresh(async (userId, newToken) => {
     console.log("refreshing access token, check tokens.json");
-    if (!(secrets.streamSafeTerminal ?? true))
+    if (secrets.extremelyStreamUnsafeTerminal)
         console.log(JSON.stringify(newToken)); // in case writeFile fails
     await fs.writeFile("conf/tokens.json", JSON.stringify(newToken, null, 4), "utf-8");
 });
@@ -46,7 +46,7 @@ const chat = new ChatClient({
     requestMembershipEvents: false // only trigger onJoin on bot joining
 });
 chat.onJoin((channel, user) => {
-    console.log(`joined ${channel}`);
+    console.log(`joined ${channel} as ${user}`);
     const page = Math.ceil(Math.random() * 727);
     chat.action(channel, `glows magenta and opens to page ${page}`);
 });
@@ -64,14 +64,13 @@ chat.onMessage((channel, user, text, msg) => {
 chat.connect();
 // import code commands last to avoid blocking chat.connect() or something idk
 let { codecmds } = await import("./conf/commands.mjs");
+// one more thing
+process.on("exit", (code) => console.log(`exiting w/ code ${code}`));
 
 /* 
 the actual command engines
 TODO switch to bun and typescript to make the function signatures not ugly
 */
-function builtin(channel, user, text, msg) {
-    return false; // TODO
-}
 function prefix(channel, user, text, msg) {
     const [firstword] = text.split(' ', 1); // NO SPACES IN PREFIXES!
     let command = commands.prefix[firstword] // undefined for cmds that don't exist
@@ -108,7 +107,7 @@ function regex(channel, user, text, msg) {
             return true;
         }
     }
-    return false; // TODO
+    return false;
 }
 function executeCommand(command, channel, user, text, msg) {
     switch(command.action) {
@@ -131,7 +130,7 @@ function executeCommand(command, channel, user, text, msg) {
                 break;
             }
             if (commands[type][trigger].action === "alias") { // no recursive aliases
-                console.error(`invalid alias target ${command.body} (it's already an alias)`);
+                console.error(`alias target ${command.body} is itself an alias`);
                 chat.say(channel, `@${secrets.streamerUsername} Check the terminal (${command.body} is an alias itself and can't have aliases)`);
                 break;
             }
@@ -143,4 +142,43 @@ function executeCommand(command, channel, user, text, msg) {
             console.error(`invalid action ${command.action}`);
             chat.say(channel, `@${secrets.streamerUsername} Check the terminal (${command.action} isn't a valid command action)`);
     }
+}
+// section: [🏳️‍⚧️.png]
+function builtin(channel, user, text, msg) {
+    // check prefix match
+    if (!text.startsWith(settings.builtin.prefix)) return false;
+    // check userlevel
+    if (!Util.meetsUserlevel({userlevel: "mod"}, msg.userInfo)) {
+        console.log(`${user} tried to use builtin @ ${new Date(Date.now()).toISOString()}`);
+        chat.say(channel, `Using ${settings.builtin.prefix} requires mod perms`, {replyTo: msg});
+    } else { // userlevel met
+        // section: [watermelon pig fruit bowl.jpg]
+        const argv = text.split(/\s+/);
+        console.log(`${user} used builtin @ ${new Date(Date.now()).toISOString()}. argv[1] is ${argv[1]}`);
+        switch (argv[1]) {
+            case "cmd":
+                // section: [small girly plastic bike for kids.jpg]
+                // TODO
+                chat.say(channel, `Subcommand cmd not implemented yet; edit conf/commands.json and ${settings.builtin.prefix} reload for now`, {replyTo: msg});
+                break;
+            case "reload":
+                const jsonLoaded = fs.readFile("conf/commands.json", "utf-8").then((val) => {commands = JSON.parse(val);});
+                const mjsLoaded = import("./conf/commands.mjs").then((mod) => {codecmds = mod.codecmds;});
+                Promise.all([jsonLoaded, mjsLoaded]).then(() => chat.say(channel, "All commands reloaded", {replyTo: msg})).catch((e) => {
+                    chat.say(channel, `Reload failed! @${secrets.streamerUsername} Check the terminal and probably restart the bot`, {replyTo: msg});
+                    console.error(e);
+                }); // do I have to make everything async to write modern js properly?
+                break;
+            case "shutdown":
+                const qaa = () => { // quit after action
+                    process.exitCode = 0;
+                    chat.quit();
+                }
+                if (isNaN(parseFloat(argv[2]))) chat.action(channel, "slams shut").then(qaa);
+                else setTimeout(() => chat.action(channel, "ceases to glow magenta").then(qaa), parseFloat(argv[2]) * 1000);
+                break;
+            default: chat.say(channel, `Unrecognized subcommand ${argv[1]}`, {replyTo: msg});
+        }
+    }
+    return true;
 }

@@ -1,7 +1,7 @@
 {
     "builtin": {
         "prefix": "!grimoire",
-        "commands": {
+        "cmd": {
             "userlevel": "everyone",
             "cooldown": 30
         }

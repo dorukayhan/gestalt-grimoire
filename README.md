@@ -25,7 +25,8 @@ Note that this thing's development is "it works on my machine"-driven and may or
 5. Read the comments in grimoire.mjs and fill out conf/settings.json and conf/secrets.json accordingly
 6. `mkdir conf/cmdstate`
 
-Then run the bot with `node grimoire.mjs`. It should "glow magenta and open to page [random number between 1 and 727]" if everything is set up correctly.
+Then run the bot with `node grimoire.mjs`. It should "glow magenta and open to page [random number between 1 and 727]" if everything is set up correctly.  
+**Be sure to not show the terminal on stream!**
 
 ### Commands
 
@@ -60,13 +61,13 @@ All commands are kept in conf/commands.json, inside the appropriate one of the `
 
 #### Built-in commands
 
-The built-in is a prefix that contains subcommands for managing the bot. The syntax is `[built-in] [subcommand] [subcommand args]` (e.g. `!grimoire commands add prefix !xd xdd`), everything is case-sensitive, and the following subcommands are ~~available~~ planned:
+The built-in is a prefix that contains subcommands for managing the bot. The syntax is `[built-in] [subcommand] [subcommand args]` (e.g. `!grimoire cmd add prefix !xd xdd`), everything is case-sensitive, and the following subcommands are ~~available~~ planned:
 
-- `commands` manages commands (no shit Omanyte). `type` must be one of `prefix`/`infix`/`regex`
-    - `commands [add/edit] [type] [command] [body]` adds/edits text commands. `command` can't contain spaces, and new commands use the default `userlevel` and `cooldown` from `builtin.commands` in conf/settings.json
-    - `commands alias [type] [command] [body]` adds/edits aliases. Same details as `commands [add/edit]` apply
-    - `commands set [type] [command] [userlevel/cooldown/cd/enabled/flags] [value]` edits command properties (`cd` is short for `cooldown`)
-    - `commands [delete/remove] [type] [command]` deletes commands. Deleting a code command won't remove its function from conf/commands.mjs!
+- `cmd` manages commands (no shit Omanyte). `type` must be one of `prefix`/`infix`/`regex`
+    - `cmd [add/edit] [type] [command] [body]` adds/edits text commands. `command` can't contain spaces, and new commands use the default `userlevel` and `cooldown` from `builtin.cmd` in conf/settings.json
+    - `cmd alias [type] [command] [body]` adds/edits aliases. Same details as `cmd [add/edit]` apply
+    - `cmd set [type] [command] [userlevel/cooldown/cd/enabled/flags] [value]` edits command properties (`cd` is short for `cooldown`)
+    - `cmd [delete/remove] [type] [command]` deletes commands. Deleting a code command won't remove its function from conf/commands.mjs!
 - `reload` reloads conf/commands.json and conf/commands.mjs. This can be used for changing a bunch of stuff all at once and is the only way to add/edit code commands without restarting the bot
 - `shutdown [seconds]` does exactly what it says. The bot "ceases to glow magenta" after `seconds` seconds, or "slams shut" immediately if `seconds` isn't given
 
