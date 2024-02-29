@@ -16,6 +16,6 @@
   "repository": "github:dorukayhan/gestalt-grimoire",
   "private": true,
   "dependencies": {
-    "@twurple/chat": "7.0.7"
+    "@twurple/chat": "7.0.10"
   }
 }
