@@ -5,6 +5,11 @@ conf/tokens.json
 conf/secrets.json
 conf/cmdstate
 
+# other package managers' lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
 # Logs
 logs
 *.log
