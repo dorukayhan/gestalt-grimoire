@@ -154,7 +154,7 @@ function builtin(channel, user, text, msg) {
     } else { // userlevel met
         // section: [watermelon pig fruit bowl.jpg]
         const argv = text.split(/\s+/);
-        console.log(`${user} used builtin @ ${new Date(Date.now()).toISOString()}. argv[1] is ${argv[1]}`);
+        console.log(`${user} used builtin @ ${new Date(Date.now()).toISOString()} w/ subcommand ${argv.slice(1)}`);
         switch (argv[1]) {
             case "cmd":
                 // section: [small girly plastic bike for kids.jpg]
@@ -171,8 +171,9 @@ function builtin(channel, user, text, msg) {
                 break;
             case "shutdown":
                 const qaa = () => { // quit after action
-                    process.exitCode = 0;
+                    chat.part(channel);
                     chat.quit();
+                    process.nextTick(process.exit, 0); // fr what could go wrong?
                 }
                 if (isNaN(parseFloat(argv[2]))) chat.action(channel, "slams shut").then(qaa);
                 else setTimeout(() => chat.action(channel, "ceases to glow magenta").then(qaa), parseFloat(argv[2]) * 1000);
