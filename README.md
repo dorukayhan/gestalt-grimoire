@@ -2,15 +2,15 @@
 
 Here's yet another chat command engine for Twitch. It exists solely because I couldn't be bothered to learn [advanced Nightbot sorcery](https://docs.nightbot.tv/commands/variableslist).
 
-<sup>It also makes for nice "I know JS of the Node variety!" cred.</sup>
+<sup>It also makes for nice "I know server-side JS!" cred.</sup>
 
 ## Usage
 
-Note that this thing's development is "it works on my machine"-driven and may or may not work on yours. Make sure you at least have [the latest Node.js Current](https://nodejs.org/dist/latest/) I guess?
+Note that this thing's development is "it works on my machine"-driven and may or may not work on yours. Make sure you at least have your favorite JS runtime's latest version I guess?
 
 ### Installing and running
 
-1. `git clone git@github.com:dorukayhan/gestalt-grimoire.git && cd gestalt-grimoire && npm install`
+1. `git clone git@github.com:dorukayhan/gestalt-grimoire.git && cd gestalt-grimoire && npm install || yarn install || pnpm install || bun install --no-save`
 2. Create an account for the bot and make it a mod in your chat
 3. Follow the [Twurple bot example](https://twurple.js.org/docs/examples/chat/basic-bot.html)'s instructions to get an access token. Use `http://localhost` as the redirect URI, `chat:read+chat:edit+channel:moderate` as the scope, and `curl -X POST https://id.twitch.tv/oauth2/token?client_id=FILL_IN&client_secret=FILL_IN&code=YEP&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost` for the part of the OAuth flow that requires leaving your browser
 4. Put the token in conf/tokens.json like so:
@@ -25,7 +25,7 @@ Note that this thing's development is "it works on my machine"-driven and may or
 5. Read the comments in grimoire.mjs and fill out conf/settings.json and conf/secrets.json accordingly
 6. `mkdir conf/cmdstate`
 
-Then run the bot with `node grimoire.mjs`. It should "glow magenta and open to page [random number between 1 and 727]" if everything is set up correctly.  
+Then run grimoire.mjs. The bot should join your chat and "glow magenta and open to page [random number between 1 and 727]" if everything is set up correctly.  
 **Be sure to not show the terminal on stream!**
 
 ### Commands
@@ -39,7 +39,7 @@ Gestalt Grimoire has three types of commands, differing in how they're checked a
 - **Infixes** can be anywhere in the message
     - Also case-sensitive
 - **Regexes** are regular expressions (duh) that must match the message
-    - [JavaScript regex rules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions) apply (Copy of duh)
+    - [JS regex rules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions) apply (Copy of duh)
     - `s` and `u` flags apply by default
 
 (Regexes alone would be enough, of course, but then there wouldn't be a way to generate a readable command list.)

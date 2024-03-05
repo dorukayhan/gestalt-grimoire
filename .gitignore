@@ -3,7 +3,12 @@
 
 conf/tokens.json
 conf/secrets.json
-conf/cmdstate
+conf/cmdstate/
+
+# npm gets lockfile privileges
+yarn.lock
+pnpm-lock.yaml
+*.lockb
 
 # Logs
 logs
