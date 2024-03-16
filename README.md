@@ -61,7 +61,7 @@ All commands are kept in conf/commands.json, inside the appropriate one of the `
 
 #### Built-in commands
 
-The built-in is a prefix that contains subcommands for managing the bot. The syntax is `[built-in] [subcommand] [subcommand args]` (e.g. `!grimoire cmd add prefix !xd xdd`), everything is case-sensitive, and the following subcommands are ~~available~~ planned:
+The built-in is a prefix that contains subcommands for managing the bot. The syntax is `[built-in] [subcommand] [subcommand args]` (e.g. `!grimoire cmd add prefix !xd xdd`), everything is case-sensitive, and the following subcommands are available:
 
 - `cmd` manages commands (no shit Omanyte). `type` must be one of `prefix`/`infix`/`regex`
     - `cmd [add/edit] [type] [command] [body]` adds/edits text commands. `command` can't contain spaces, and new commands use the default `userlevel` and `cooldown` from `builtin.cmd` in conf/settings.json
