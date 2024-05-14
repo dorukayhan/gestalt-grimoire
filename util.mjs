@@ -12,7 +12,7 @@ class Util {
     /** path of commands.json relative to grimoire.mjs */
     static get commandsPath() { return "conf/commands.json"; }
     /** path of commands.mjs relative to grimoire.mjs */
-    static get codecmdsPath() { return "conf/commands.mjs"; }
+    static get codecmdsPath() { return "./conf/commands.mjs"; }
     static get defaultestUserlevel() { return "everyone"; }
     static get defaultestCD() { return 30; }
     /**

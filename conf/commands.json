@@ -1,12 +1,5 @@
 {
     "prefix": {
-        "!spin": {
-            "action": "text",
-            "body": "owoSpin",
-            "userlevel": "everyone",
-            "cooldown": 5,
-            "enabled": true
-        },
         "!hugme": {
             "action": "code",
             "body": "hugme",

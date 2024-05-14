@@ -1,6 +1,6 @@
 {
   "name": "gestalt-grimoire",
-  "version": "0.7.27",
+  "version": "1.0.0",
   "description": "Yet another command-based chatbot",
   "main": "grimoire.mjs",
   "homepage": "https://github.com/dorukayhan/gestalt-grimoire",

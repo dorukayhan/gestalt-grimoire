@@ -167,7 +167,6 @@ function builtin(channel, user, text, msg) {
         switch (argv[1]) {
             case "cmd":
                 builtinCmd(channel, user, text, argv, msg);
-                chat.say(channel, `Subcommand cmd not implemented yet; edit ${Util.commandsPath} and ${SETTINGS.builtin.prefix} reload for now`, {replyTo: msg});
                 break;
             case "reload":
                 const jsonLoaded = fs.readFile(Util.commandsPath, "utf-8").then((val) => {COMMANDS = JSON.parse(val);});
@@ -194,7 +193,7 @@ function builtin(channel, user, text, msg) {
 // section: [small girly plastic bike for kids.jpg]
 function builtinCmd(channel, user, text, argv, msg) {
     // argv[3] is type, argv[4] is trigger, argv[5] is cmd set's prop name
-    if (!isValidType(argv[3])) {
+    if (!Util.isValidType(argv[3])) {
         chat.say(channel, `Valid command types are prefix, infix, and regex, not ${argv[3]}. See README`, {replyTo: msg});
         return;
     }
@@ -204,7 +203,7 @@ function builtinCmd(channel, user, text, argv, msg) {
             if (COMMANDS[argv[3]][argv[4]])
                 chat.say(channel, `${argv[3]} ${argv[4]} already exists; can't overwrite it with cmd add`, {replyTo: msg});
             else {
-                bodyIndex = argv.slice(0, 4).reduce((a, b) => a.length + b.length) + 5; // plus 5 spaces
+                bodyIndex = argv.slice(0, 5).map(s => s.length).reduce((a, b) => a+b, 0) + 5; // plus 5 spaces
                 // async catch callbacks feel nicer than try-catch statements idk
                 builtinCmdAddEditAlias(false, argv[3], argv[4], text.substring(bodyIndex))
                     .then(() => chat.say(channel, `Successfully added ${argv[3]} ${argv[4]}`, {replyTo: msg})).catch((e) => {
@@ -219,7 +218,7 @@ function builtinCmd(channel, user, text, argv, msg) {
             else if (COMMANDS[argv[3]][argv[4]].action !== "text")
                 chat.say(channel, `cmd edit only works on text commands and ${argv[3]} ${argv[4]} isn't one`, {replyTo: msg});
             else {
-                bodyIndex = argv.slice(0, 4).reduce((a, b) => a.length + b.length) + 5;
+                bodyIndex = argv.slice(0, 5).map(s => s.length).reduce((a, b) => a+b, 0) + 5;
                 builtinCmdAddEditAlias(false, argv[3], argv[4], text.substring(bodyIndex))
                     .then(() => chat.say(channel, `Successfully edited ${argv[3]} ${argv[4]}`, {replyTo: msg})).catch((e) => {
                         chat.say(channel, `Command edit failed (probably just couldn't save to ${Util.commandsPath})! @${SECRETS.streamerUsername} Check the terminal`, {replyTo: msg});
@@ -228,10 +227,10 @@ function builtinCmd(channel, user, text, argv, msg) {
             }
             break;
         case "alias":
-            if (COMMANDS[argv[3]][argv[4]]?.action !== "alias") // if cmd exists and isn't an alias
-                chat.say(channel, `Can't overwrite text ${argv[3]} ${argv[4]} with an alias`, {replyTo: msg});
+            if (COMMANDS[argv[3]][argv[4]] && COMMANDS[argv[3]][argv[4]].action !== "alias") // if cmd exists and isn't an alias
+                chat.say(channel, `${argv[3]} ${argv[4]} exists and isn't an alias, can't overwrite it with one`, {replyTo: msg});
             else {
-                bodyIndex = argv.slice(0, 4).reduce((a, b) => a.length + b.length) + 5;
+                bodyIndex = argv.slice(0, 5).map(s => s.length).reduce((a, b) => a+b, 0) + 5;
                 builtinCmdAddEditAlias(true, argv[3], argv[4], text.substring(bodyIndex))
                     .then(() => chat.say(channel, `Successfully aliased ${argv[3]} ${argv[4]} to ${text.substring(bodyIndex)}`, {replyTo: msg})).catch((e) => {
                         chat.say(channel, `Aliasing failed (probably just couldn't save to ${Util.commandsPath})! @${SECRETS.streamerUsername} Check the terminal`, {replyTo: msg});
@@ -248,7 +247,7 @@ function builtinCmd(channel, user, text, argv, msg) {
             else if (argv[5] === "flags" && argv[3] !== "regex")
                 chat.say(channel, `Flags can only be set on regexes`, {replyTo: msg});
             else {
-                bodyIndex = argv.slice(0, 5).reduce((a, b) => a.length + b.length) + 6;
+                bodyIndex = argv.slice(0, 6).map(s => s.length).reduce((a, b) => a+b, 0) + 6;
                 builtinCmdSet(argv[3], argv[4], argv[5], text.substring(bodyIndex))
                     .then((ret) => chat.say(channel, ret, {replyTo: msg})).catch((e) => {
                         chat.say(channel, `Setting failed for some reason! (probably just couldn't save to ${Util.commandsPath})! @${SECRETS.streamerUsername} Check the terminal`, {replyTo: msg});
@@ -319,7 +318,8 @@ async function builtinCmdSet(type, trigger, prop, value) {
     }
 }
 async function builtinCmdDelete(type, trigger) {
-
+    delete COMMANDS[type][trigger];
+    await saveCommands();
 }
 function saveCommands() {
     const prep = (key, value) => (key === "lastUsed" && typeof value === "number") ? undefined : value; // scrub last-use timestamps

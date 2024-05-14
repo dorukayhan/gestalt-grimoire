@@ -1,15 +1,14 @@
 # Gestalt Grimoire
 
-Here's yet another chat command engine for Twitch. It exists solely because I couldn't be bothered to learn [advanced Nightbot sorcery](https://docs.nightbot.tv/commands/variableslist).
+Here's yet another chat command engine for Twitch. It exists because making an entire chatbot seemed (and in fact is) more fun than mastering Nightbot's eval().
 
 <sup>It also makes for nice "I know server-side JS!" cred.</sup>
 
 ## Usage
 
-Note that this thing's development is "it works on my machine"-driven and may or may not work on yours. Make sure you at least have your favorite JS runtime's latest version I guess?
-
 ### Installing and running
 
+0. Have the latest Node.js Current or a JS runtime compatible with it
 1. `git clone git@github.com:dorukayhan/gestalt-grimoire.git && cd gestalt-grimoire && npm install || yarn install || pnpm install || bun install --no-save`
 2. Create an account for the bot and make it a mod in your chat
 3. Follow the [Twurple bot example](https://twurple.js.org/docs/examples/chat/basic-bot.html)'s instructions to get an access token. Use `http://localhost` as the redirect URI, `chat:read+chat:edit+channel:moderate` as the scope, and `curl -X POST https://id.twitch.tv/oauth2/token?client_id=FILL_IN&client_secret=FILL_IN&code=YEP&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost` for the part of the OAuth flow that requires leaving your browser
@@ -23,7 +22,8 @@ Note that this thing's development is "it works on my machine"-driven and may or
     }
     ```
 5. Read the comments in grimoire.mjs and fill out conf/settings.json and conf/secrets.json accordingly
-6. `mkdir conf/cmdstate`
+6. If you're switching from another bot, add your commands to conf/commands.json, following the examples and this README
+7. `mkdir conf/cmdstate`
 
 Then run grimoire.mjs. The bot should join your chat and "glow magenta and open to page [random number between 1 and 727]" if everything is set up correctly.  
 **Be sure to not show the terminal on stream!**
@@ -76,7 +76,7 @@ The built-in is always enabled, can only be used by mods and the streamer, and h
 ### Arbitrary code execution
 
 You can put code in conf/commands.mjs to be executed via commands.  
-If this makes your inner infosec whiz scream in horror, good. If not, **remember to not put anything in them that you don't FULLY understand!**
+This is akin to pressing F12 in your browser and typing stuff into the console, so **do NOT put anything in it that you don't FULLY understand!**
 
 (hint: if it touches conf/tokens.json _at all_ or calls any `chat` method other than `say()` and `action()`, it's malware; only grimoire.mjs should be doing those)
 
@@ -90,4 +90,4 @@ Every command whose `action` is `code` names a conf/commands.mjs function in its
 - `text` (message that triggered the command)
 - `msg` ([aforementioned message's metadata](https://twurple.js.org/reference/chat/classes/ChatMessage.html))
 
-Avoid defining variables outside of functions in commands.mjs - `[built-in] reload` may break things otherwise. If your command needs state (e.g. a counter), put it in a file in conf/cmdstate and load it anew every time the command is used (like a browser cookie!).
+Avoid defining variables outside of functions in commands.mjs - `[built-in] reload` may break things otherwise. If your command needs state (e.g. a counter), put it in a file in conf/cmdstate and load it anew every time the command is used.

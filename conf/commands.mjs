@@ -1,4 +1,3 @@
-import { ChatClient } from "@twurple/chat"; // FIXME FIXME FIXME FIXME FIXME
 import * as fs from "fs"; // can't be bothered to make everything async
 
 const codecmds = {
