@@ -8,11 +8,13 @@ Here's yet another chat command engine for Twitch. It exists because making an e
 
 ### Installing and running
 
-0. Have the latest Node.js Current or a JS runtime compatible with it
-1. `git clone git@github.com:dorukayhan/gestalt-grimoire.git && cd gestalt-grimoire && npm install || yarn install || pnpm install || bun install --no-save`
-2. Create an account for the bot and make it a mod in your chat
-3. Follow the [Twurple bot example](https://twurple.js.org/docs/examples/chat/basic-bot.html)'s instructions to get an access token. Use `http://localhost` as the redirect URI, `chat:read+chat:edit+channel:moderate` as the scope, and `curl -X POST https://id.twitch.tv/oauth2/token?client_id=FILL_IN&client_secret=FILL_IN&code=YEP&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost` for the part of the OAuth flow that requires leaving your browser
-4. Put the token in conf/tokens.json like so:
+0. Be a control freak who just has to understand EXACTLY what their chatbot is doing. If you're not one, consider using [Mix It Up](https://mixitupapp.com) instead 
+1. Have the latest Node.js LTS or a JS runtime compatible with it
+2. `git clone git@github.com:dorukayhan/gestalt-grimoire.git && cd gestalt-grimoire`
+3. `npm install` etc.
+4. Create an account for the bot and make it a mod in your chat
+5. Follow the [Twurple bot example](https://twurple.js.org/docs/examples/chat/basic-bot.html)'s instructions to get an access token. Use `http://localhost` as the redirect URI, `chat:read+chat:edit+channel:moderate` as the scope, and `curl -X POST https://id.twitch.tv/oauth2/token?client_id=FILL_IN&client_secret=FILL_IN&code=YEP&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost` for the part that requires leaving your browser
+6. Put the token in conf/tokens.json like so:
     ```
     {
         "accessToken": "???",
@@ -21,11 +23,11 @@ Here's yet another chat command engine for Twitch. It exists because making an e
         "obtainmentTimestamp": 0
     }
     ```
-5. Read the comments in grimoire.mjs and fill out conf/settings.json and conf/secrets.json accordingly
-6. If you're switching from another bot, add your commands to conf/commands.json, following the examples and this README
-7. `mkdir conf/cmdstate`
+7. Read the comments in grimoire.mjs and fill out conf/settings.json and conf/secrets.json accordingly
+8. If you're switching from another bot, add your commands to conf/commands.json, following the examples and this README
+9. `mkdir conf/cmdstate`
 
-Then run grimoire.mjs. The bot should join your chat and "glow magenta and open to page [random number between 1 and 727]" if everything is set up correctly.  
+Then run grimoire.mjs to start the bot. It should "glow magenta and open to page [random number]" in your chat if everything is set up correctly.  
 **Be sure to not show the terminal on stream!**
 
 ### Commands
@@ -35,14 +37,12 @@ Gestalt Grimoire has three types of commands, differing in how they're checked a
 - **Prefixes** must be at the start of the message
     - Spaces aren't allowed and the initial ! or $ or whatever has to be included, like Nightbot
     - Case-sensitive, unlike Nightbot
-    - `!grimoire` (or whatever you set `builtin.prefix` to in conf/settings.json) is the **built-in** for stuff like adding/removing commands and gets special treatment (e.g. you can't override it with a prefix of the same name)
+    - `!grimoire` (or whatever you set `builtin.prefix` to in conf/settings.json) is the **built-in** for stuff like adding/removing commands and gets special treatment
 - **Infixes** can be anywhere in the message
     - Also case-sensitive
 - **Regexes** are regular expressions (duh) that must match the message
     - [JS regex rules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions) apply (Copy of duh)
     - `s` and `u` flags apply by default
-
-(Regexes alone would be enough, of course, but then there wouldn't be a way to generate a readable command list.)
 
 The built-in is checked first, then prefixes, then infixes, then regexes, and the first command that matches is executed. For instance:
 
@@ -50,7 +50,7 @@ The built-in is checked first, then prefixes, then infixes, then regexes, and th
 - if your built-in is `!grimoire` and you (for some reason) add a prefix named `!grimoire`, the prefix will never run
 - if a message matches three infixes and a regex, the infix that appears first in conf/commands.json runs
 
-All commands are kept in conf/commands.json, inside the appropriate one of the `prefix`, `infix`, and `regex` objects, which function as maps where the keys are commands and the values are each command's properties. The said properties are:
+All commands are kept in conf/commands.json as objects inside the appropriate one of the `prefix`, `infix`, and `regex` objects. Each object's key is the command and its values are the command's properties:
 
 - `action` (what the command does - `text`, `code`, or `alias`)
 - `body` (if `type` is `text`, string to post in chat; if it's `code`, name of function in conf/commands.mjs to execute; if it's `alias`, another command to execute in the form `(prefix|infix|regex) [command]`)
@@ -69,7 +69,7 @@ The built-in is a prefix that contains subcommands for managing the bot. The syn
     - `cmd set [type] [command] [userlevel/cooldown/cd/enabled/flags] [value]` edits command properties (`cd` is short for `cooldown`)
     - `cmd [delete/remove] [type] [command]` deletes commands. Deleting a code command won't remove its function from conf/commands.mjs!
 - `reload` reloads conf/commands.json and conf/commands.mjs. This can be used for changing a bunch of stuff all at once and is the only way to add/edit code commands without restarting the bot
-- `shutdown [seconds]` does exactly what it says. The bot "ceases to glow magenta" after `seconds` seconds, or "slams shut" immediately if `seconds` isn't given
+- `shutdown [seconds]` turns off the bot. The bot "ceases to glow magenta" after `seconds` seconds, or "slams shut" immediately if `seconds` isn't given
 
 The built-in is always enabled, can only be used by mods and the streamer, and has no cooldown.
 
