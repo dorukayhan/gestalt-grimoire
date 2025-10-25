@@ -8,7 +8,8 @@ conf/cmdstate/
 # npm gets lockfile privileges
 yarn.lock
 pnpm-lock.yaml
-*.lockb
+bun.lock
+bun.lockb
 
 # Logs
 logs

@@ -2,14 +2,14 @@
 
 Here's yet another chat command engine for Twitch. It exists because making an entire chatbot seemed (and in fact is) more fun than mastering Nightbot's eval().
 
-<sup>It also makes for nice "I know server-side JS!" cred.</sup>
+<sup>It also makes for nice "I know server-side ~~JS~~ TS!" cred.</sup>
 
 ## Usage
 
 ### Installing and running
 
 0. Be a control freak who just has to understand EXACTLY what their chatbot is doing. If you're not one, consider using [Mix It Up](https://mixitupapp.com) instead 
-1. Have the latest Node.js LTS or a JS runtime compatible with it
+1. Have the latest Node.js LTS or a compatible JS runtime **with native TypeScript support** 
 2. `git clone git@github.com:dorukayhan/gestalt-grimoire.git && cd gestalt-grimoire`
 3. `npm install` etc.
 4. Create an account for the bot and make it a mod in your chat
@@ -23,11 +23,11 @@ Here's yet another chat command engine for Twitch. It exists because making an e
         "obtainmentTimestamp": 0
     }
     ```
-7. Read the comments in grimoire.mjs and fill out conf/settings.json and conf/secrets.json accordingly
+7. Read the comments at the top of grimoire.mts and fill out conf/settings.json and conf/secrets.json accordingly
 8. If you're switching from another bot, add your commands to conf/commands.json, following the examples and this README
 9. `mkdir conf/cmdstate`
 
-Then run grimoire.mjs to start the bot. It should "glow magenta and open to page [random number]" in your chat if everything is set up correctly.  
+Then run grimoire.mts to start the bot. It should "glow magenta and open to page [random number]" in your chat if everything is set up correctly.  
 **Be sure to not show the terminal on stream!**
 
 ### Commands
@@ -53,7 +53,7 @@ The built-in is checked first, then prefixes, then infixes, then regexes, and th
 All commands are kept in conf/commands.json as objects inside the appropriate one of the `prefix`, `infix`, and `regex` objects. Each object's key is the command and its values are the command's properties:
 
 - `action` (what the command does - `text`, `code`, or `alias`)
-- `body` (if `type` is `text`, string to post in chat; if it's `code`, name of function in conf/commands.mjs to execute; if it's `alias`, another command to execute in the form `(prefix|infix|regex) [command]`)
+- `body` (if `type` is `text`, string to post in chat; if it's `code`, name of function in conf/commands.mts to execute; if it's `alias`, another command to execute in the form `(prefix|infix|regex) [command]`)
 - `userlevel` (minimum chat privileges required to use the command - `streamer`, `mod`, or `everyone`)
 - `cooldown` in seconds
 - `enabled` (whether the command works at all - true or false)
@@ -67,22 +67,22 @@ The built-in is a prefix that contains subcommands for managing the bot. The syn
     - `cmd [add/edit] [type] [command] [body]` adds/edits text commands. `command` can't contain spaces, and new commands use the default `userlevel` and `cooldown` from `builtin.cmd` in conf/settings.json
     - `cmd alias [type] [command] [body]` adds/edits aliases. Same details as `cmd [add/edit]` apply
     - `cmd set [type] [command] [userlevel/cooldown/cd/enabled/flags] [value]` edits command properties (`cd` is short for `cooldown`)
-    - `cmd [delete/remove] [type] [command]` deletes commands. Deleting a code command won't remove its function from conf/commands.mjs!
-- `reload` reloads conf/commands.json and conf/commands.mjs. This can be used for changing a bunch of stuff all at once and is the only way to add/edit code commands without restarting the bot
+    - `cmd [delete/remove] [type] [command]` deletes commands. Deleting a code command won't remove its function from conf/commands.mts!
+- `reload` reloads conf/commands.json and conf/commands.mts. This can be used for changing a bunch of stuff all at once and is the only way to add/edit code commands without restarting the bot
 - `shutdown [seconds]` turns off the bot. The bot "ceases to glow magenta" after `seconds` seconds, or "slams shut" immediately if `seconds` isn't given
 
 The built-in is always enabled, can only be used by mods and the streamer, and has no cooldown.
 
 ### Arbitrary code execution
 
-You can put code in conf/commands.mjs to be executed via commands.  
+You can put code in conf/commands.mts to be executed via commands.  
 This is akin to pressing F12 in your browser and typing stuff into the console, so **do NOT put anything in it that you don't FULLY understand!**
 
-(hint: if it touches conf/tokens.json _at all_ or calls any `chat` method other than `say()` and `action()`, it's malware; only grimoire.mjs should be doing those)
+(hint: if it touches conf/tokens.json _at all_ or calls any `chat` method other than `say()` and `action()`, it's malware; only grimoire.mts should be doing those)
 
 #### Code commands
 
-Every command whose `action` is `code` names a conf/commands.mjs function in its `body`. This function should have the following parameters in order:
+Every command whose `action` is `code` names a conf/commands.mts function in its `body`. This function should have the following parameters in order:
 
 - `chat` (send messages using `chat.say()` and `chat.action()`)
 - `channel` (streamer's username, needed for `say()` and `action()`)
@@ -90,4 +90,4 @@ Every command whose `action` is `code` names a conf/commands.mjs function in its
 - `text` (message that triggered the command)
 - `msg` ([aforementioned message's metadata](https://twurple.js.org/reference/chat/classes/ChatMessage.html))
 
-Avoid defining variables outside of functions in commands.mjs - `[built-in] reload` may break things otherwise. If your command needs state (e.g. a counter), put it in a file in conf/cmdstate and load it anew every time the command is used.
+Avoid defining variables outside of functions in commands.mts - `[built-in] reload` may break things otherwise. If your command needs state (e.g. a counter), put it in a file in conf/cmdstate and load it anew every time the command is used.

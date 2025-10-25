@@ -1,6 +1,8 @@
 import * as fs from "fs"; // can't be bothered to make everything async
+import type { ChatClient, ChatMessage } from '@twurple/chat';
 
-const codecmds = {
+type Codecmd = (chat: ChatClient, channel: string, user: string, text: string, msg: ChatMessage) => void;
+const codecmds: Record<string, Codecmd> = {
     hugme: (chat, channel, user, text, msg) => {
         // example stateful codecmd (put the whole thing in the readFile callback I'm sure it'll be fine xdd)
         // use JSON or something for any state more complex than a single number/string/etc
@@ -19,7 +21,7 @@ const codecmds = {
         if (argv.length <= 1) {
             help(); return;
         }
-        let stack = [];
+        let stack: Array<number> = [];
         console.log(`codecmds.math: rpn evaling ${argv.slice(1).join(" ")}`);
         for (const token of argv.slice(1)) {
             let lhs, rhs;
@@ -35,12 +37,13 @@ const codecmds = {
                 case "++": stack = [stack.reduce((a, b) => a + b, 0)]; break;
                 case "**": stack = [stack.reduce((a, b) => a * b, 1)]; break;
                 // stack utils
-                case "swap": if (stack.length >= 2) {rhs = stack.pop(); lhs = stack.pop(); stack.push(rhs); stack.push(lhs);} break;
-                case "dup": if (stack.length >= 1) {rhs = stack.pop(); stack.push(rhs); stack.push(rhs);} break;
-                // Math.whatever
-                // abusing the object["property"] notation to avoid repeating myself
-                case "floor": case "ceil": case "round": case "trunc": stack.push(Math[token](stack.pop())); break;
-                case "min": case "max": if (stack.length >= 2) {rhs = stack.pop(); lhs = stack.pop(); stack.push(Math[token](lhs, rhs));} break;
+                // SAFETY: BRO I JUST LOOKED AT STACK.LENGTH
+                case "swap": if (stack.length >= 2) {rhs = stack.pop(); lhs = stack.pop(); stack.push(rhs!); stack.push(lhs!);} break;
+                case "dup": if (stack.length >= 1) {rhs = stack.pop(); stack.push(rhs!); stack.push(rhs!);} break;
+                // Math.whatever, abusing the object["property"] notation to avoid repeating myself
+                // SAFETY: oh does tsc not know that pop() returns undefined IFF the stack is empty?
+                case "floor": case "ceil": case "round": case "trunc": if (stack.length >= 1) stack.push(Math[token](stack.pop()!)); break;
+                case "min": case "max": if (stack.length >= 2) {rhs = stack.pop(); lhs = stack.pop(); stack.push(Math[token](lhs!, rhs!));} break;
                 default: rhs = Number.parseFloat(token); if (Number.isNaN(rhs)) {help(); return;} stack.push(rhs);
             }
         }
